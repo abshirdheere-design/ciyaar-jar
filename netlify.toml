@@ -1,3 +1,12 @@
+<<<<<<< HEAD
 [build]
   command = "echo 'No build needed'"  # skip build step
   publish = "public"                  # folder-ka static site
+=======
+[template.environment]
+ANTHROPIC_API_KEY = "Add your Anthropic API key here"
+
+[build]
+command = "npm run build"
+publish = "dist/client"
+>>>>>>> a4e8218f6f7546e81620604296ef6edf32de7340
