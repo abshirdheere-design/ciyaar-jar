@@ -1,0 +1,3 @@
+[build]
+  command = "echo 'No build needed'"  # skip build step
+  publish = "public"                  # folder-ka static site
