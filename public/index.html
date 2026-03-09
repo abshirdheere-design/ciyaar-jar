@@ -3,69 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <title>5x5 Online Game</title>
-<style>
-body{font-family:Arial;text-align:center;margin-top:20px;}
-#board{display:grid;grid-template-columns:repeat(5,80px);gap:10px;justify-content:center;}
-.cell{width:80px;height:80px;border:2px solid black;border-radius:50%;cursor:pointer;}
-.red{background:red;}
-.blue{background:blue;}
-.selected{outline:4px solid yellow;}
-.move{background:#90ee90;}
-</style>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-<h2>5x5 Online Game</h2>
+
+<h2>Magacaaga gali:</h2>
+<input type="text" id="nameInput" placeholder="Guest">
+<button onclick="joinGame()">Bilaab</button>
+
+<h2>Ciyaarta Godadka 5x5</h2>
 <p id="status">Connecting...</p>
 <div id="board"></div>
 
-<script src="/socket.io/socket.io.js"></script>
 <script>
-const socket = io();
-let playerColor = null;
+const socket = io("http://localhost:3000"); // Haddii online: replace URL
 let board = [];
-let currentPlayer = null;
+let currentPlayer = "red";
+
 const boardDiv = document.getElementById("board");
 const status = document.getElementById("status");
-let selected = null;
 
-// Receive assigned color
-socket.on("color", (color) => {
-  playerColor = color;
-  status.innerText = `You are ${color}`;
-});
-
-// Full server
-socket.on("full", () => alert("Server full!"));
-
-socket.on("board", (b, turn) => {
-  board = b;
-  currentPlayer = turn;
-  draw();
-});
-
-function draw() {
-  boardDiv.innerHTML = "";
-  for (let i = 0; i < board.length; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    if (board[i] === "red") cell.classList.add("red");
-    if (board[i] === "blue") cell.classList.add("blue");
-    if (i === selected) cell.classList.add("selected");
-    cell.onclick = () => clickCell(i);
-    boardDiv.appendChild(cell);
-  }
-  status.innerText = `You are ${playerColor} | Turn: ${currentPlayer}`;
+function joinGame() {
+  const name = document.getElementById("nameInput").value || "Guest";
+  socket.emit("join", name);
 }
 
-function clickCell(i) {
-  if (!playerColor || playerColor !== currentPlayer) return;
-  if (selected === null && board[i] === playerColor) {
-    selected = i;
-    draw();
-  } else if (selected !== null && board[i] === null) {
-    socket.emit("move", { from: selected, to: i, color: playerColor });
-    selected = null;
-  }
+socket.on("init", (data) => {
+  board = data.board;
+  currentPlayer = data.currentPlayer;
+  drawBoard();
+});
+
+socket.on("update", (data) => {
+  board = data.board;
+  currentPlayer = data.currentPlayer;
+  drawBoard();
+});
+
+function drawBoard() {
+  boardDiv.innerHTML = "";
+  board.forEach((cell, i) => {
+    const div = document.createElement("div");
+    div.className = "cell";
+    if (cell) div.classList.add(cell);
+    div.onclick = () => handleClick(i);
+    boardDiv.appendChild(div);
+  });
+  status.innerText = `Current turn: ${currentPlayer}`;
+}
+
+function handleClick(i) {
+  if (!board[i]) socket.emit("place", i);
 }
 </script>
 </body>
