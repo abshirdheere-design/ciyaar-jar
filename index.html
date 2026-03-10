@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciyaarta Jarta – Mobile Multiplayer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+    <h1>Ciyaarta Jarta – Mobile</h1>
+
+    <div class="join-box">
+        <input id="nameInput" type="text" placeholder="Magacaaga">
+        <input id="roomInput" type="text" placeholder="Room Code (tusaale: 1234)">
+        <button onclick="joinRoom()">Ku Biir</button>
+    </div>
+
+    <h3>Players:</h3>
+    <ul id="players"></ul>
+
+    <h3>Turn: <span id="turn">Sugaya...</span></h3>
+
+    <div id="board">
+        <script>
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    document.write(`<div class="cell" id="c${x}${y}" onclick="makeMove(${x},${y})"></div>`);
+                }
+            }
+        </script>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>
